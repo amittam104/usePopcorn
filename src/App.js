@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Children, useState } from "react";
 
 const tempMovieData = [
   {
@@ -51,21 +51,30 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
+  const [movies, setMovies] = useState(tempMovieData);
+
   return (
     <>
-      <NavBar />
-      <Main />
+      <NavBar>
+        <Search />
+        <MoviesNumCount movies={movies} />
+      </NavBar>
+      <Main>
+        <BoxList>
+          <MoviesList movies={movies} />
+        </BoxList>
+        <WatchedBox />
+      </Main>
     </>
   );
 }
 
 // Navbar Components
-function NavBar() {
+function NavBar({ children }) {
   return (
     <nav className="nav-bar">
       <Logo />
-      <Search />
-      <MoviesNumCount />
+      {children}
     </nav>
   );
 }
@@ -92,26 +101,20 @@ function Search() {
   );
 }
 
-function MoviesNumCount() {
+function MoviesNumCount({ movies }) {
   return (
     <p className="num-results">
-      Found <strong>X</strong> results
+      Found <strong>{movies.length}</strong> results
     </p>
   );
 }
 
 // Main Section Components
-function Main() {
-  return (
-    <main className="main">
-      <MoviesList />
-      <WatchedMovies />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 
-function MoviesList() {
-  const [movies, setMovies] = useState(tempMovieData);
+function BoxList({ children }) {
   const [isOpen1, setIsOpen1] = useState(true);
 
   return (
@@ -122,14 +125,18 @@ function MoviesList() {
       >
         {isOpen1 ? "–" : "+"}
       </button>
-      {isOpen1 && (
-        <ul className="list">
-          {movies?.map((movie) => (
-            <Movie movie={movie} />
-          ))}
-        </ul>
-      )}
+      {isOpen1 && children}
     </div>
+  );
+}
+
+function MoviesList({ movies }) {
+  return (
+    <ul className="list">
+      {movies?.map((movie) => (
+        <Movie movie={movie} />
+      ))}
+    </ul>
   );
 }
 
@@ -148,7 +155,7 @@ function Movie({ movie }) {
   );
 }
 
-function WatchedMovies() {
+function WatchedBox() {
   const [isOpen2, setIsOpen2] = useState(true);
   const [watched, setWatched] = useState(tempWatchedData);
 
